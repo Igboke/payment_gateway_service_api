@@ -44,4 +44,7 @@ class ClientChangeForm(UserChangeForm):
     """
     Client Change form inherits from User Change Form
     """
-    pass
+    class Meta:
+        model = Client
+        fields = "__all__"
+        
