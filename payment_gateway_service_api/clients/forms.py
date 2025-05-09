@@ -46,5 +46,5 @@ class ClientChangeForm(UserChangeForm):
     """
     class Meta:
         model = Client
-        fields = "__all__"
-        
+        fields = ('email', 'first_name', 'last_name', 'middle_name')
+
