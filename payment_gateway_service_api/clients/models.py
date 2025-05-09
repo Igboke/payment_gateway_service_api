@@ -54,6 +54,7 @@ class Client(AbstractUser):
     """
     Client inherits from the Abstract user class. this is to set the username to be field
     """
+    username = models.CharField(max_length=150, unique=False, null=True, blank=True)
     email = models.EmailField(null=False,unique=True,help_text="Enter mail")
     last_name = models.CharField(max_length=50,help_text="Enter Surname")
     first_name= models.CharField(max_length=50,help_text="Enter First Name")
@@ -68,10 +69,13 @@ class Client(AbstractUser):
     REQUIRED_FIELDS = []
 
     def get_full_name(self):
-        pass
+        return f"{self.first_name} {self.last_name}"
 
     def house_address(self):
-        pass
+        """
+        Returns the house address of the client
+        """
+        return f"{self.street}, {self.town}, {self.state}"
 
 
     objects=ClientManager()
