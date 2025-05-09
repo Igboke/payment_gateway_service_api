@@ -61,6 +61,8 @@ class Client(AbstractUser):
     street = models.CharField(max_length=100,help_text="Enter street")
     town = models.CharField(max_length=50,help_text="Enter Town")
     state = models.CharField(max_length=50,help_text="Enter State")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
