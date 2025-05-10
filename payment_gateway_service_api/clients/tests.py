@@ -90,3 +90,6 @@ class ClientModelTest(TestCase):
         
         print(context.exception)
         self.assertIn("Cannot delete some instances of model", str(context.exception))
+
+    def test_username_field_is_email(self):
+        self.assertEqual(get_user_model().USERNAME_FIELD, 'email')
