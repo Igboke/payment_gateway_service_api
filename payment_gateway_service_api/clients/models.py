@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.contrib.auth import get_user_model
+from clients.utils import Address
 
 class ClientManager(BaseUserManager):
     """
@@ -59,9 +60,7 @@ class Client(AbstractUser):
     last_name = models.CharField(max_length=50,help_text="Enter Surname")
     first_name= models.CharField(max_length=50,help_text="Enter First Name")
     middle_name = models.CharField(max_length=50,null=True,help_text="Enter Optional middle name")
-    street = models.CharField(max_length=100,help_text="Enter street")
-    town = models.CharField(max_length=50,help_text="Enter Town")
-    state = models.CharField(max_length=50,help_text="Enter State")
+    house_address = models.ForeignKey(Address,on_delete=models.PROTECT,related_name="client")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -70,12 +69,6 @@ class Client(AbstractUser):
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
-
-    def house_address(self):
-        """
-        Returns the house address of the client
-        """
-        return f"{self.street}, {self.town}, {self.state}"
 
 
     objects=ClientManager()
