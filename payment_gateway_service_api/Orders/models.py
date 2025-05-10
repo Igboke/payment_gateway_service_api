@@ -30,12 +30,6 @@ class Orders(models.Model):
     def calculate_total_amount(self):
         total = sum(item.product.price * item.quantity for item in self.order_line.all())
         self.total_amount = total
-    
-    def save(self, *args, **kwargs):
-        if self.pk is None:
-            super().save(*args,**kwargs)
-        self.calculate_total_amount()
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.client} -- #Order No: {self.pk}"
@@ -58,4 +52,6 @@ def update_order_total(sender, instance, **kwargs):
     """
     Update the total amount of the order when an OrderItem is saved or deleted.
     """
-    instance.order.save(update_fields=["total_amount"])
+    order = instance.order
+    order.calculate_total_amount()
+    order.save(update_fields=["total_amount"])
