@@ -14,7 +14,7 @@ STATUS_CHOICES=[
     ("failed",("Failed"))
 ]
 class Orders(models.Model):
-    client = models.ForeignKey(ClientModel,on_delete=models.DO_NOTHING,related_name="orders",help_text="Select the Client making the Order")
+    client = models.ForeignKey(ClientModel,on_delete=models.SET_NULL,related_name="orders",help_text="Select the Client making the Order",null=True,blank=False)
     status = models.CharField(max_length=15,default="pending",choices=STATUS_CHOICES,help_text="Status Choices")
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, help_text="Order Total",null=False,blank=True, default=0)
     shipping_address = models.ForeignKey(Address,on_delete=models.SET_NULL,related_name="shipped_orders",help_text="Shipping Adress",null=True,blank=False)
@@ -41,7 +41,7 @@ class Orders(models.Model):
         return f"{self.client} -- #Order No: {self.pk}"
     
 class OrderItem(models.Model):
-    product = models.ForeignKey(Products,on_delete=models.DO_NOTHING,related_name="product_items")
+    product = models.ForeignKey(Products,on_delete=models.CASCADE,related_name="product_items")
     order = models.ForeignKey(Orders,on_delete=models.CASCADE,related_name="order_line")
     quantity = models.IntegerField(help_text="Enter OrderItem Quantity",validators=[MinValueValidator(1)])
 
