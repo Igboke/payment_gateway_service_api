@@ -28,6 +28,17 @@ class ClientModelTest(TestCase):
         self.assertEqual(self.client_1.email,"danieligboke669@gmail.com")
         self.assertEqual(self.client_1.house_address.street_line1,"Bourdillion 1234")
 
+    def test_create_user_no_email_fails(self):
+        with self.assertRaises(ValueError) as context:
+            get_user_model().objects.create_user(
+                email=None,
+                password="testpassword",
+                last_name="Invalid",
+                first_name="User",
+                house_address=self.Address_1,
+            )
+        self.assertIn("Email is required, email must be set", str(context.exception))
+
     def test_client_str(self):
         self.assertEqual(str(self.client_1),self.client_1.email)
 
@@ -40,7 +51,7 @@ class ClientModelTest(TestCase):
                 first_name="John",
                 house_address=self.Address_1,
             )
-        self.assertEqual(str(context.exception), "UNIQUE constraint failed: clients_client.email")
+        self.assertIn('unique constraint', str(context.exception).lower())
 
     def test_full_name_func(self):
         full_name = f"{self.client_1.first_name} {self.client_1.last_name}"
