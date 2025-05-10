@@ -1,8 +1,22 @@
 from django.contrib import admin
 from .models import Client
 from django.contrib.auth.admin import UserAdmin
-from .forms import ClientCreationForm, ClientChangeForm
-from django.contrib.auth import get_user_model
+from .forms import ClientCreationForm, ClientChangeForm, AddressCreationForm
+from .utils import Address
+
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
+    add_form = AddressCreationForm
+    list_display = ("street_line1","street_line2","city","state_province","country")
+    search_fields = ("city","state_province","country")
+    ordering = ("city",)  
+    filter_horizontal = ()
+    add_fieldsets = (
+        (None, {
+            "classes":("wide","collapse"),
+            "fields":("street_line1","street_line2","city","state_province","country","postal_code"),    
+        }),
+    )
 
 class ClientAdmin(UserAdmin):
     """
@@ -26,7 +40,7 @@ class ClientAdmin(UserAdmin):
         }),
         ("Address", {
             "classes":("collapse",),
-            "fields":("street","town","state")
+            "fields":("house_address",)
         }),
     )
     fieldsets = (
@@ -39,7 +53,7 @@ class ClientAdmin(UserAdmin):
         }),
         ("Address", {
             "classes":("collapse",),
-            "fields":("street","town","state")
+            "fields":("house_address",)
         }),
         ("Permissions", {
             "fields":("is_staff","is_active"),
