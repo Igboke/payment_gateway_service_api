@@ -41,3 +41,7 @@ class ClientModelTest(TestCase):
                 house_address=self.Address_1,
             )
         self.assertEqual(str(context.exception), "UNIQUE constraint failed: clients_client.email")
+
+    def test_full_name_func(self):
+        full_name = f"{self.client_1.first_name} {self.client_1.last_name}"
+        self.assertEqual(self.client_1.get_full_name(), full_name)
