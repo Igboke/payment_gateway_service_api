@@ -15,8 +15,8 @@ class Orders(models.Model):
     client = models.ForeignKey(ClientModel,on_delete=models.DO_NOTHING,related_name="orders",help_text="Select the Client making the Order")
     status = models.CharField(max_length=15,default="pending",choices=STATUS_CHOICES,help_text="Status Choices")
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, help_text="Order Total",null=False,blank=True)
-    shipping_address = models.ForeignKey(Address,on_delete=models.DO_NOTHING,related_name="shipped_orders",help_text="Shipping Adress")
-    billing_address = models.ForeignKey(Address,on_delete=models.DO_NOTHING,help_text="Billing Adress",related_name="billed_orders")
+    shipping_address = models.ForeignKey(Address,on_delete=models.SET_NULL,related_name="shipped_orders",help_text="Shipping Adress",null=True,blank=False)
+    billing_address = models.ForeignKey(Address,on_delete=models.SET_NULL,help_text="Billing Adress",related_name="billed_orders",null=True,blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
