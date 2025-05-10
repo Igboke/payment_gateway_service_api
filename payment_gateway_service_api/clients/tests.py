@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from .utils import Address
+from django.db.utils import IntegrityError
 
 class ClientModelTest(TestCase):
     """
@@ -26,3 +27,17 @@ class ClientModelTest(TestCase):
     def test_client_creation(self):
         self.assertEqual(self.client_1.email,"danieligboke669@gmail.com")
         self.assertEqual(self.client_1.house_address.street_line1,"Bourdillion 1234")
+
+    def test_client_str(self):
+        self.assertEqual(str(self.client_1),self.client_1.email)
+
+    def test_unique_email(self):
+        with self.assertRaises(IntegrityError) as context:
+            get_user_model().objects.create_user(
+                email=self.client_1.email,
+                password="anotherpassword123",
+                last_name="Doe",
+                first_name="John",
+                house_address=self.Address_1,
+            )
+        self.assertEqual(str(context.exception), "UNIQUE constraint failed: clients_client.email")
