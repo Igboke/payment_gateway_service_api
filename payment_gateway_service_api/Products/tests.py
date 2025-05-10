@@ -45,3 +45,12 @@ class ProductsModelTest(TestCase):
         self.assertEqual(str(self.product_1), "Test Product 1")
         self.assertEqual(str(self.product_2), "Test Product 2")
 
+    def test_product_ordering(self):
+        """
+        Test the ordering of products by created_at.
+        the list is then a list of products with oldest at 0 then 1 and so on
+        """
+        products = Products.objects.all()
+        self.assertEqual(products[0], self.product_1)
+        self.assertEqual(products[1], self.product_2)
+
