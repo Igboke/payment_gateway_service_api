@@ -1,3 +1,4 @@
+from django.forms import ValidationError
 from django.test import TestCase
 from .models import Products, Orders, OrderItem, Address
 from django.contrib.auth import get_user_model
@@ -71,5 +72,36 @@ class OrdersTestCase(TestCase):
         self.assertEqual(self.order_item.order, self.order_1)
         self.assertEqual(self.order_item.quantity, 2)
         self.assertEqual(OrderItem.objects.count(), 1)
+
+    def test_order_item_str(self):
+        """
+        Test the string representation of an order item
+        """
+        self.order_item = OrderItem.objects.create(
+            product=self.product,
+            order=self.order_1,
+            quantity=2
+        )
+        self.assertEqual(str(self.order_item), str(self.order_item.pk))
+
+    def test_quantity_min_value_validator(self):
+        """
+        Test that quantity must be at least 1
+        """
+        order_item = OrderItem(product=self.product, order=self.order_1, quantity=0)
+
+        with self.assertRaises(ValidationError) as context:
+            order_item.full_clean()
+
+        self.assertIn('quantity', context.exception.message_dict)
+        self.assertIn('Ensure this value is greater than or equal to 1.', context.exception.message_dict['quantity'][0])
+
+        # Attempt to create an OrderItem with negative quantity
+        order_item_negative = OrderItem(product=self.product, order=self.order_1, quantity=-5)
+        with self.assertRaises(ValidationError) as context:
+            order_item_negative.full_clean()
+
+        self.assertIn('quantity', context.exception.message_dict)
+        self.assertIn('Ensure this value is greater than or equal to 1.', context.exception.message_dict['quantity'][0])
     
 
