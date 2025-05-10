@@ -38,3 +38,10 @@ class ProductsModelTest(TestCase):
         self.assertEqual(self.product_1.price, 99.99)
         self.assertTrue(self.product_1.is_available)
 
+    def test_product_str(self):
+        """
+        Test the string representation of a product.
+        """
+        self.assertEqual(str(self.product_1), "Test Product 1")
+        self.assertEqual(str(self.product_2), "Test Product 2")
+
