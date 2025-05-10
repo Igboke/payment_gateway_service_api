@@ -56,3 +56,27 @@ class ClientModelTest(TestCase):
     def test_full_name_func(self):
         full_name = f"{self.client_1.first_name} {self.client_1.last_name}"
         self.assertEqual(self.client_1.get_full_name(), full_name)
+
+    def test_optional_fields_can_be_null_or_empty(self):
+        client_optional = get_user_model().objects.create_user(
+            email="optionaluser@example.com",
+            password="password123",
+            last_name="Optional",
+            first_name="User",
+            house_address=self.Address_1,
+            username=None,      # Testing null=True
+            middle_name=""      # Testing blank=True (might save as None if null=True)
+        )
+        self.assertIsNone(client_optional.username)
+        self.assertTrue(client_optional.middle_name is None or client_optional.middle_name == "")
+
+        # Or simply test creating without providing them
+        client_no_optional = get_user_model().objects.create_user(
+            email="nooptional@example.com",
+            password="password123",
+            last_name="No",
+            first_name="Optional",
+            house_address=self.Address_1,
+        )
+        self.assertIsNone(client_no_optional.username)
+        self.assertTrue(client_no_optional.middle_name is None or client_no_optional.middle_name == "")
