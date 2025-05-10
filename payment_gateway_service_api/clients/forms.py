@@ -1,10 +1,16 @@
 from django import forms
-from django.forms import ModelForm, Form
+from django.forms import ModelForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import ValidationError
+from .utils import Address
 
 Client = get_user_model()
+
+class AddressCreationForm(ModelForm):
+    class Meta:
+        model = Address
+        fields = "__all__"
 
 # two forms user creation form and user update form
 class ClientCreationForm(ModelForm):
@@ -46,5 +52,5 @@ class ClientChangeForm(UserChangeForm):
     """
     class Meta:
         model = Client
-        fields = ('email', 'first_name', 'last_name', 'middle_name')
+        fields = "__all__"
 
