@@ -1,8 +1,6 @@
 from django.contrib import admin
-from django.forms import forms # forms is imported though not explicitly used here, good practice
+from django.forms import forms 
 from .models import Orders, OrderItem
-# Make sure to import Address correctly based on your project structure
-# from clients.utils import Address
 
 # Inline for OrderItem
 class OrderItemInline(admin.TabularInline):
@@ -20,14 +18,14 @@ class OrdersAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('client', 'status', ('shipping_address', 'billing_address')),
+            "fields": ("client", "status", ("shipping_address", "billing_address")),
         }),
-        ('Order Details', {
-            'fields': ('total_amount',),
+        ("Order Details", {
+            "fields": ("total_amount",),
         }),
-        ('Timestamps', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',),
+        ("Timestamps", {
+            "fields": ("created_at", "updated_at"),
+            "classes": ("collapse",),
         }),
     )
 
