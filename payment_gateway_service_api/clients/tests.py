@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from .utils import Address
 from django.db.utils import IntegrityError
+from django.db.models import ProtectedError
 
 class ClientModelTest(TestCase):
     """
@@ -80,3 +81,12 @@ class ClientModelTest(TestCase):
         )
         self.assertIsNone(client_no_optional.username)
         self.assertTrue(client_no_optional.middle_name is None or client_no_optional.middle_name == "")
+
+    def test_address_protects_client_deletion(self):
+        # Attempt to delete the Address object that self.client_1 is linked to
+        with self.assertRaises(ProtectedError) as context:
+            self.Address_1.delete()
+        self.assertIsInstance(context.exception, ProtectedError)
+        
+        print(context.exception)
+        self.assertIn("Cannot delete some instances of model", str(context.exception))
