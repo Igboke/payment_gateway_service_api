@@ -22,12 +22,6 @@ class ProductsModelTest(TestCase):
             price=49.99,
             is_available = False,
         )
-        # self.product_3 = Products.objects.create(
-        #     name = "Invalid Test Product 3",
-        #     quantity = -10,
-        #     description = "Invalid Test Description 3",
-        #     price = 19.99,
-        # )
     def test_product_creation(self):
         """
         Test the creation of a product.
@@ -53,4 +47,28 @@ class ProductsModelTest(TestCase):
         products = Products.objects.all()
         self.assertEqual(products[0], self.product_1)
         self.assertEqual(products[1], self.product_2)
+    
+    def test_product_constraints(self):
+        """
+        Test the constraints on the product model.
+        """
+        with self.assertRaises(Exception) as context:
+            # Attempt to create a product with negative quantity
+            Products.objects.create(
+                name="Invalid Test Product 3",
+                quantity=-10,
+                description="Invalid Test Description 3",
+                price=19.99,
+            )
+        
+        self.assertEqual(str(context.exception), "CHECK constraint failed: quantity_greater_than_zero")
+
+    def test_product_availability(self):
+        """
+        Test the availability of a product.
+        assert true is true if condition is true.
+        assert false is true if condition is false
+        """
+        self.assertTrue(self.product_1.is_available)
+        self.assertFalse(self.product_2.is_available)
 
