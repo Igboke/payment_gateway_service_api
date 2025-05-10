@@ -1,4 +1,6 @@
 from django.db import models
+from django.dispatch import receiver
+from django.db.models.signals import post_save, post_delete
 from django.core.validators import MinValueValidator
 from django.contrib.auth import get_user_model
 from Products.models import Products
@@ -14,7 +16,7 @@ STATUS_CHOICES=[
 class Orders(models.Model):
     client = models.ForeignKey(ClientModel,on_delete=models.DO_NOTHING,related_name="orders",help_text="Select the Client making the Order")
     status = models.CharField(max_length=15,default="pending",choices=STATUS_CHOICES,help_text="Status Choices")
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2, help_text="Order Total",null=False,blank=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, help_text="Order Total",null=False,blank=True, default=0)
     shipping_address = models.ForeignKey(Address,on_delete=models.SET_NULL,related_name="shipped_orders",help_text="Shipping Adress",null=True,blank=False)
     billing_address = models.ForeignKey(Address,on_delete=models.SET_NULL,help_text="Billing Adress",related_name="billed_orders",null=True,blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -30,16 +32,17 @@ class Orders(models.Model):
         self.total_amount = total
     
     def save(self, *args, **kwargs):
-        if self.pk and not self.total_amount: 
-            self.calculate_total_amount()
+        if self.pk is None:
+            super().save(*args,**kwargs)
+        self.calculate_total_amount()
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.client} -- #Order No: {self.pk}"
     
 class OrderItem(models.Model):
-    products = models.ForeignKey(Products,on_delete=models.DO_NOTHING,related_name="product_items")
-    orders = models.ForeignKey(Orders,on_delete=models.CASCADE,related_name="order_line")
+    product = models.ForeignKey(Products,on_delete=models.DO_NOTHING,related_name="product_items")
+    order = models.ForeignKey(Orders,on_delete=models.CASCADE,related_name="order_line")
     quantity = models.IntegerField(help_text="Enter OrderItem Quantity",validators=[MinValueValidator(1)])
 
     class Meta:
@@ -50,4 +53,9 @@ class OrderItem(models.Model):
         return f"{self.pk}"
     
 
-
+@receiver([post_delete,post_save], sender=OrderItem)
+def update_order_total(sender, instance, **kwargs):
+    """
+    Update the total amount of the order when an OrderItem is saved or deleted.
+    """
+    instance.order.save(update_fields=["total_amount"])
