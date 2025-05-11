@@ -73,9 +73,14 @@ class OrdersSerializers(serializers.ModelSerializer):
             "order_line",
         ]
 
-class InitiatePaymentBankIncomingSerializers(serializers.Serializer):
+class BankTransferSerializers(serializers.Serializer):
     """
     Serializer for incoming Bank payment request
     """
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    email = serializers.EmailField()
+    currency = serializers.CharField(max_length=3,default="NGN")
+    tx_ref = serializers.CharField(max_length=100)
+    fullname = serializers.CharField(max_length=100)
+    is_permanent = serializers.BooleanField(default=False)
     
-    pass
