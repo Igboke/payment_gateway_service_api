@@ -46,6 +46,25 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.pk}"
     
+class PaymentTransaction(models.Model):
+    order = models.ForeignKey(Orders,on_delete=models.CASCADE,related_name="payment_transaction")
+    client = models.ForeignKey(ClientModel,on_delete=models.CASCADE,related_name="client_payment")
+    amount = models.DecimalField(max_digits=10, decimal_places=2, help_text="Payment Amount")
+    status = models.CharField(max_length=15,default="pending",choices=STATUS_CHOICES,help_text="Payment Status")
+    transaction_ref = models.CharField(max_length=255, unique=True, help_text="Internal transaction reference.")
+    gateway_ref = models.CharField(max_length=255,null=True, unique=True, help_text="Payment gateway transaction reference.")
+    gateway_name = models.CharField(max_length=50, help_text="Payment gateway name.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Payment Transaction"
+        verbose_name_plural = "Payment Transactions"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.gateway_name} - {self.transaction_ref} - {self.status}"
+
 
 @receiver([post_delete,post_save], sender=OrderItem)
 def update_order_total(sender, instance, **kwargs):
