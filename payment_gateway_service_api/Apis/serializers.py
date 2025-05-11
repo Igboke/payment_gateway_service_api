@@ -36,13 +36,46 @@ class ClientModelSerializers(serializers.ModelSerializer):
             "email",
             "house_address",
         ]
-    pass
 
 class ProductsSerializers(serializers.ModelSerializer):
-    pass
+    """
+    Product Serializer
+    """
+    class Meta:
+        model = Products
+        fields = [
+            "id",
+            "name",
+            "quantity"
+            "description",
+            "price",
+            "is_available",
+        ]
 
 class OrdersSerializers(serializers.ModelSerializer):
-    pass
+    """
+    Order Serializer
+    """
+    client = ClientModelSerializers(read_only=True)
+    shipping_address = AddressSerializers(many=True)
+    billing_address = AddressSerializers(many=True)
+    order_line = serializers.PrimaryKeyRelatedField(many=True, queryset=OrderItem.objects.all())
 
-class InitiatePaymentIncomingSerializers(serializers.Serializer):
+    class Meta:
+        model = Orders
+        fields = [
+            "id",
+            "client",
+            "status",
+            "total_amount",
+            "shipping_address",
+            "billing_address",
+            "order_line",
+        ]
+
+class InitiatePaymentBankIncomingSerializers(serializers.Serializer):
+    """
+    Serializer for incoming Bank payment request
+    """
+    
     pass
