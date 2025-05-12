@@ -90,16 +90,6 @@ class FlutterWaveAdapter(PaymentGatewayInterface):
         response = requests.post(endpoint, json=payload, headers=self.headers)
         data = response.json()
         return data
-           
-    def update_payment_details(self,data:Dict[str, Any],payment_details,client_payment_details_instance) -> dict:
-        # Update payment details in the database
-        if data["status"] == "success":
-            # Update the transaction model with the response data
-            client_payment_details_instance.gateway_ref = data["meta"]["Authorization"]["transfer_reference"]
-            client_payment_details_instance.amount = payment_details.amount
-            client_payment_details_instance.payment_status = "pending"
-            client_payment_details_instance.save()
-            
     
     def handle_webhook(self, request) -> dict:
         # Handle webhook notifications from FlutterWave
