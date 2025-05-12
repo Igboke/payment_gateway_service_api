@@ -1,15 +1,7 @@
 from dataclasses import dataclass
-from ports_and_adapters import PaymentGatewayInterface
+from payment_gateway_service_api.Apis.payments_ports_and_adapters import PaymentDetails, PaymentGatewayInterface
 from utils import ClientPaymentDetails, get_client_by_mail
 
-@dataclass
-class PaymentDetails:
-    tx_ref: str
-    amount: float
-    currency: str
-    client_email: str
-    client_name: str
-    is_permanent: bool = False
 
 class PaymentServiceCore:
     def __init__(self,gateway_adapter: PaymentGatewayInterface):
@@ -24,4 +16,5 @@ class PaymentServiceCore:
         payment_details.client_name = self.client.get_full_name()
         payment_details.currency = "NGN"
         self.gateway_adapter.process_payment(payment_details,client_payment_transaction_instance)
+        #update payment model here
         
