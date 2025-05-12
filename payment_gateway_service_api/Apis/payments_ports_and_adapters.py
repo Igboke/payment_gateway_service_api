@@ -48,10 +48,6 @@ class PaymentGatewayInterface(ABC):
         pass
 
     @abstractmethod
-    def update_payment_details(self,):
-        pass
-
-    @abstractmethod
     def verify_payment(self, transaction_ref: str) -> dict:
         """Verifies a payment via this gateway. Returns gateway-specific response."""
         pass
