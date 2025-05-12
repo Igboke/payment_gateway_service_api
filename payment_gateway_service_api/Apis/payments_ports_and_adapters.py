@@ -38,17 +38,17 @@ class PaymentGatewayInterface(ABC):
     - verifying payments.
     """
     @abstractmethod
-    def process_payment(self, payment_details: PaymentDetails,client_payment_details_instance:ClientPaymentDetails) -> dict:
-        """Initiates a payment via this gateway. Returns gateway-specific response."""
+    def process_payment(self, payment_details: PaymentDetails) -> GatewayProcessPaymentResponseDTO:
+        """Initiates a payment via this gateway. Returns core DTO based on gateway response."""
         pass
 
     @abstractmethod
-    def handle_webhook(self, request: Any) -> dict:
-        """Handles incoming webhook notifications from the payment gateway. Returns processed data."""
+    def handle_webhook(self, raw_webhook_data: Any) -> GatewayWebhookEventDTO:
+        """Handles incoming raw webhook data, verifies, and returns core DTO."""
         pass
 
     @abstractmethod
-    def verify_payment(self, transaction_ref: str) -> dict:
+    def verify_payment(self, transaction_ref: str) -> Dict[str, Any]: # Or return a GatewayVerificationResponseDTO?
         """Verifies a payment via this gateway. Returns gateway-specific response."""
         pass
 
