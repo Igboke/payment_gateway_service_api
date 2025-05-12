@@ -39,7 +39,7 @@ class PaymentServiceCore:
         create_transaction_dto = CreateTransactionDTO(
             client_id=client.id,
             order_id=latest_order_id,
-            amount=request_data.amount, 
+            amount=request_data.amount, #fix amount, amount needs to be generated from order
             transaction_ref=transaction_ref,
             gateway_name="Bank Transfer",
             
