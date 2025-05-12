@@ -7,6 +7,7 @@ ClientModel = get_user_model()
 class ClientPaymentDetails:
     """
     Client Payment Details
+    This class is used to handle payment transaction details for a client.
     """
     def __init__(self, client):
         self.client = client
@@ -14,13 +15,21 @@ class ClientPaymentDetails:
         self.amount = None
         self.payment_status = None
 
-    def set_transaction_model(self, transaction_reference):
+    def set_transaction_model(self)-> PaymentTransaction:
+        """
+        - order: pk 
+        - client: pk
+        - amount: decimal 
+        - status : string, not implemented here
+        - transaction_ref: str, unique
+        - gateway_ref: not implemented here
+        - gateway_name: str, Bank Transfer default, updated later 
+        """
         PaymentTransaction.objects.create(
             order=self.get_transaction_order(),
-            client=self.client,
+            client=self.client.pk,
             amount=self.get_payment_amount(),
-            transaction_ref=transaction_reference,
-            gateway_ref=transaction_reference,
+            transaction_ref=self.generate_transaction_reference(),
             gateway_name="Bank Transfer"
         )
 
@@ -45,6 +54,13 @@ class ClientPaymentDetails:
             return self.amount
         except Orders.DoesNotExist:
             return None
+        
+    def generate_transaction_reference(self):
+        """
+        Generate Transaction Reference using standard uuid.uuid4()
+        """
+        # Generate a unique transaction reference using UUID
+        return str(uuid.uuid4())
 
 def get_client_by_mail(email):
     """
@@ -56,16 +72,6 @@ def get_client_by_mail(email):
     except ClientModel.DoesNotExist:
         return None
     
-def generate_amount_details(client):
-    """
-    Generate Amount Details
-    """
-    return client.orders.total_amount
 
-def generate_transaction_object():
-    """
-    Generate Transaction Reference
-    """
-    
-    return str(uuid.uuid4())
+
     
