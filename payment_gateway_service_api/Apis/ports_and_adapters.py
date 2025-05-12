@@ -1,12 +1,16 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 from .core_logic import PaymentDetails
+from django.conf import settings
+import requests
 
 class PaymentGatewayInterface(ABC):
     """Interface for payment gateway adapters.
     Methods in this interface should be implemented by all payment gateway adapters.
-    Each adapter should handle its own specific logic for processing payments,
-    handling webhooks, and verifying payments.
+    Each adapter should handle its own specific logic for:
+    - processing payments,
+    - handling webhooks, 
+    - verifying payments.
     """
     @abstractmethod
     def process_payment(self, payment_details: PaymentDetails) -> dict:
@@ -22,3 +26,43 @@ class PaymentGatewayInterface(ABC):
     def verify_payment(self, transaction_ref: str) -> dict:
         """Verifies a payment via this gateway. Returns gateway-specific response."""
         pass
+
+class FlutterWaveAdapter(PaymentGatewayInterface):
+    """
+    Implements the PaymentGatewayInterface for the FlutterWave payment gateway.
+
+    def process_payment(self, payment_details: PaymentDetails):
+    providing methods to process payments, handle webhook notifications, and 
+    verify transactions. It ensures that all interactions with FlutterWave 
+    adhere to the gateway's API specifications.
+
+    Unique behavior:
+    - Processes payments by sending requests to FlutterWave's payment endpoint.
+    - Handles webhook notifications specific to FlutterWave's format.
+    - Verifies transactions using FlutterWave's verification API.
+
+    Note: This is a placeholder implementation and should be extended with 
+    actual API calls to FlutterWave's services.
+    """
+    
+    headers = {
+    "accept": "application/json",
+    "Authorization": f"Bearer {settings.FLUTTERWAVE_SECRET_KEY}",
+    "Content-Type": "application/json"
+    }
+    
+    def process_payment(self, payment_details) -> dict:
+        # Process payment using FlutterWave's bank transfer endpoint
+        endpoint = settings.FLUTTERWAVE_BANK_TRANSFER_ENDPOINT
+        payload = {
+            "amount": payment_details.amount,   
+            "email": payment_details.client_email,
+            "currency": payment_details.currency,
+            "tx_ref": payment_details.tx_ref,
+            "full_name": payment_details.client_name,
+            "is_permanent": payment_details.is_permanent
+        }
+        response = requests.post(endpoint, json=payload, headers=self.headers)
+        return response.json()
+
+        
