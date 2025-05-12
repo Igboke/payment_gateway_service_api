@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
+from payment_gateway_service_api.Apis.utils import ClientPaymentDetails
 from .core_logic import PaymentDetails
 from django.conf import settings
 import requests
@@ -13,7 +14,7 @@ class PaymentGatewayInterface(ABC):
     - verifying payments.
     """
     @abstractmethod
-    def process_payment(self, payment_details: PaymentDetails) -> dict:
+    def process_payment(self, payment_details: PaymentDetails,client_payment_details_instance:ClientPaymentDetails) -> dict:
         """Initiates a payment via this gateway. Returns gateway-specific response."""
         pass
 
@@ -51,7 +52,7 @@ class FlutterWaveAdapter(PaymentGatewayInterface):
     "Content-Type": "application/json"
     }
     
-    def process_payment(self, payment_details) -> dict:
+    def process_payment(self, payment_details,client_payment_details_instance) -> dict:
         # Process payment using FlutterWave's bank transfer endpoint
         endpoint = settings.FLUTTERWAVE_BANK_TRANSFER_ENDPOINT
         payload = {
@@ -63,6 +64,21 @@ class FlutterWaveAdapter(PaymentGatewayInterface):
             "is_permanent": payment_details.is_permanent
         }
         response = requests.post(endpoint, json=payload, headers=self.headers)
+        data = response.json()
+        if data["status"] == "success":
+            # Update the transaction model with the response data
+            client_payment_details_instance.gateway_ref = data["meta"]["Authorization"]["transfer_reference"]
+            client_payment_details_instance.amount = payment_details.amount
+            client_payment_details_instance.payment_status = "pending"
+            client_payment_details_instance.save()
+    def handle_webhook(self, request) -> dict:
+        # Handle webhook notifications from FlutterWave
+        # This is a placeholder implementation
+        return {"status": "Webhook received", "data": request.data}
+    def verify_payment(self, transaction_ref: str) -> dict:
+        # Verify payment using FlutterWave's verification API
+        endpoint = f"https://api.flutterwave.com/v3/charges?tx_ref={transaction_ref}"
+        response = requests.get(endpoint, headers=self.headers)
         return response.json()
 
         
