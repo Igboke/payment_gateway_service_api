@@ -1,8 +1,20 @@
 from dataclasses import dataclass
-from payment_gateway_service_api.Apis.payments_ports_and_adapters import PaymentDetails, PaymentGatewayInterface
+from payment_gateway_service_api.Apis.payments_ports_and_adapters import GatewayProcessPaymentResponseDTO, PaymentDetails, PaymentGatewayInterface
 from utils import ClientPaymentDetails, get_client_by_mail
 
+# DTOs used by the core itself or passed to ports
+@dataclass
+class InitialPaymentRequestDTO:
+    client_email: str
+    amount: float
+    currency: str
+    is_permanent: bool = False
 
+@dataclass
+class InitiatedPaymentResponseDTO: # Output from the core's initiate_payment method
+    transaction_ref: str
+    gateway_response: GatewayProcessPaymentResponseDTO
+     
 class PaymentServiceCore:
     def __init__(self,gateway_adapter: PaymentGatewayInterface):
         self.gateway_adapter = gateway_adapter
