@@ -91,7 +91,7 @@ class DjangoClientRepositoryAdapter(ClientRepositoryInterface):
             client=transaction_data.client_id,
             order=transaction_data.order_id,
             amount=transaction_data.amount,
-            transaction_ref=str(uuid.uuid4()),
+            transaction_ref=transaction_data.transaction_ref,
             gateway_name=transaction_data.gateway_name
         )
         
