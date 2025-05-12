@@ -23,5 +23,5 @@ class PaymentServiceCore:
         payment_details.client_email = self.client.email
         payment_details.client_name = self.client.get_full_name()
         payment_details.currency = "NGN"
-        self.gateway_adapter.process_payment(payment_details)
+        self.gateway_adapter.process_payment(payment_details,client_payment_transaction_instance)
         
