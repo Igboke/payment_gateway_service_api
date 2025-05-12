@@ -19,15 +19,14 @@ class PaymentDetails:
 class GatewayProcessPaymentResponseDTO:
     success: bool
     gateway_ref: Optional[str] = None
-    redirect_url: Optional[str] = None
     raw_response: Dict = field(default_factory=dict)
 
 @dataclass
 class GatewayWebhookEventDTO:
-     gateway_ref: str
-     event_type: str
-     new_status: str 
-     amount: float
+    gateway_ref: str
+    event_type: str
+    new_status: str 
+    amount: float
 
 class PaymentGatewayInterface(ABC):
     """Interface for payment gateway adapters.
@@ -56,18 +55,10 @@ class FlutterWaveAdapter(PaymentGatewayInterface):
     """
     Implements the PaymentGatewayInterface for the FlutterWave payment gateway.
 
-    def process_payment(self, payment_details: PaymentDetails):
-    providing methods to process payments, handle webhook notifications, and 
-    verify transactions. It ensures that all interactions with FlutterWave 
-    adhere to the gateway's API specifications.
-
     Unique behavior:
     - Processes payments by sending requests to FlutterWave's payment endpoint.
     - Handles webhook notifications specific to FlutterWave's format.
     - Verifies transactions using FlutterWave's verification API.
-
-    Note: This is a placeholder implementation and should be extended with 
-    actual API calls to FlutterWave's services.
     """
     
     headers = {
@@ -76,11 +67,10 @@ class FlutterWaveAdapter(PaymentGatewayInterface):
     "Content-Type": "application/json"
     }
     
-    def process_payment(self, payment_details,client_payment_details_instance) -> dict:
-        # Process payment using FlutterWave's bank transfer endpoint
+    def process_payment(self, payment_details: PaymentDetails) -> GatewayProcessPaymentResponseDTO:
         endpoint = settings.FLUTTERWAVE_BANK_TRANSFER_ENDPOINT
         payload = {
-            "amount": payment_details.amount,   
+            "amount": payment_details.amount,
             "email": payment_details.client_email,
             "currency": payment_details.currency,
             "tx_ref": payment_details.tx_ref,
@@ -88,8 +78,20 @@ class FlutterWaveAdapter(PaymentGatewayInterface):
             "is_permanent": payment_details.is_permanent
         }
         response = requests.post(endpoint, json=payload, headers=self.headers)
+        response.raise_for_status()
         data = response.json()
-        return data
+
+        # Translate FlutterWave response into core GatewayProcessPaymentResponseDTO
+        success = data.get("status") == "success"
+        gateway_ref = None
+        if success and "meta" in data and "Authorization" in data["meta"]:
+             gateway_ref = data["meta"]["Authorization"].get("transfer_reference")
+
+        return GatewayProcessPaymentResponseDTO(
+            success=success,
+            gateway_ref=gateway_ref,
+            raw_response=data
+        )
     
     def handle_webhook(self, request) -> dict:
         # Handle webhook notifications from FlutterWave
@@ -100,6 +102,7 @@ class FlutterWaveAdapter(PaymentGatewayInterface):
         # Verify payment using FlutterWave's verification API
         endpoint = f"https://api.flutterwave.com/v3/charges?tx_ref={transaction_ref}"
         response = requests.get(endpoint, headers=self.headers)
+        response.raise_for_status()
         return response.json()
 
         
