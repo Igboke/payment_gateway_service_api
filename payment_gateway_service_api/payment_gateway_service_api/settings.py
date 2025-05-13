@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     #Installed apps
     'rest_framework',
+    'drf_spectacular',
     'clients.apps.ClientsConfig',
     'Apis.apps.ApisConfig',
     'Orders.apps.OrdersConfig',
@@ -86,6 +87,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'payment_gateway_service_api.wsgi.application'
 
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Payment Gateway Service API',
+    'DESCRIPTION': 'API for Payment',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
