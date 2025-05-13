@@ -7,10 +7,10 @@ from .repositories_ports_and_adapters import ClientRepositoryInterface, CreateTr
 @dataclass
 class InitialPaymentRequestDTO:
     client_email: str
-    amount: float
     currency: str
     payment_gateway_name:str
     is_permanent: bool = False
+    amount: float = 0.0
     
 
 @dataclass
