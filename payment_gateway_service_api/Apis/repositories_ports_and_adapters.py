@@ -58,8 +58,8 @@ class ClientRepositoryInterface(ABC):
         pass
 
     @abstractmethod
-    def get_latest_order_for_client(self, client_id: Any) -> Optional[Any]:
-         """Get the ID/details of the client's latest order."""
+    def get_latest_order_and_amount_for_client(self, client_id: Any) -> list:
+         """Get the ID/details and amount of the client's latest order."""
          pass
     
 
@@ -79,10 +79,11 @@ class DjangoClientRepositoryAdapter(ClientRepositoryInterface):
         except ClientModel.DoesNotExist:
             return None
 
-    def get_latest_order_for_client(self, client_id: Any) -> Optional[Any]:
+    def get_latest_order_and_amount_for_client(self, client_id: Any) -> list:
          try:
              order = Orders.objects.filter(client_id=client_id).latest('created_at')
-             return order.pk
+             amount = order.total_amount
+             return [order.pk, amount]
          except Orders.DoesNotExist:
              return None
 
@@ -108,7 +109,7 @@ class DjangoClientRepositoryAdapter(ClientRepositoryInterface):
 
     def update_payment_transaction(self, transaction_id: Any, update_data: UpdateTransactionDTO) -> PaymentTransactionDTO:
         try:
-            transaction_model = PaymentTransaction.objects.get(pk=transaction_id) # change to transaction ref
+            transaction_model = PaymentTransaction.objects.get(transaction_ref=transaction_id) # change to transaction ref
 
             # Update model fields from the update_data DTO
             if update_data.status is not None:
