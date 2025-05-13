@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional
-from .utils import ClientPaymentDetails
-from .core_logic import PaymentDetails
 from django.conf import settings
 import requests
 
