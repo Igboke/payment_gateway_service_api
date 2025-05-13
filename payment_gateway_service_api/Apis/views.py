@@ -37,7 +37,6 @@ class InitiatePaymentView(APIView):
             # Prepare input DTO for the core service
             initial_request_dto = InitialPaymentRequestDTO(
                 client_email=validated_data["email"],
-                amount=validated_data["amount"],
                 currency=validated_data["currency"],
                 is_permanent=validated_data.get("is_permanent", False),
                 payment_gateway_name="FlutterWave"
@@ -59,9 +58,13 @@ class InitiatePaymentView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
         except requests.exceptions.RequestException as e:
             
-            return Response({"error": "Payment gateway communication error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": "Payment gateway communication error:", "detail":str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
-            return Response({"error": "An internal error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            import traceback
+            print("An exception occurred:")
+            traceback.print_exc()
+            return Response({"error": "An internal error occurred", "detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
 
 
 # will add a webhook endpoint view similar to InitiatePaymentView
