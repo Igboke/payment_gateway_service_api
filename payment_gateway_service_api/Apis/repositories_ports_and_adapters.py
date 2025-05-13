@@ -82,15 +82,15 @@ class DjangoClientRepositoryAdapter(ClientRepositoryInterface):
     def get_latest_order_and_amount_for_client(self, client_id: Any) -> list:
          try:
              order = Orders.objects.filter(client_id=client_id).latest('created_at')
-             amount = order.total_amount
+             amount = float(order.total_amount) if order.total_amount is not None else 0.0
              return [order.pk, amount]
          except Orders.DoesNotExist:
-             return None
+             return [None, None]
 
     def create_payment_transaction(self, transaction_data: CreateTransactionDTO) -> PaymentTransactionDTO:
         transaction_model = PaymentTransaction.objects.create(
-            client=transaction_data.client_id,
-            order=transaction_data.order_id,
+            client_id=transaction_data.client_id,
+            order_id=transaction_data.order_id,
             amount=transaction_data.amount,
             transaction_ref=transaction_data.transaction_ref,
             gateway_name=transaction_data.gateway_name
@@ -99,9 +99,9 @@ class DjangoClientRepositoryAdapter(ClientRepositoryInterface):
         return PaymentTransactionDTO(
             id=transaction_model.pk,
             transaction_ref=transaction_model.transaction_ref,
-            amount=transaction_model.amount,
-            client_id=transaction_model.client,
-            order_id=transaction_model.order,
+            amount=float(transaction_model.amount),
+            client_id=transaction_model.client_id,
+            order_id=transaction_model.order_id,
             status=transaction_model.status,
             gateway_name=transaction_model.gateway_name,
             gateway_ref=transaction_model.gateway_ref
@@ -109,7 +109,7 @@ class DjangoClientRepositoryAdapter(ClientRepositoryInterface):
 
     def update_payment_transaction(self, transaction_id: Any, update_data: UpdateTransactionDTO) -> PaymentTransactionDTO:
         try:
-            transaction_model = PaymentTransaction.objects.get(transaction_ref=transaction_id) # change to transaction ref
+            transaction_model = PaymentTransaction.objects.get(pk=transaction_id)
 
             # Update model fields from the update_data DTO
             if update_data.status is not None:
@@ -125,9 +125,9 @@ class DjangoClientRepositoryAdapter(ClientRepositoryInterface):
             return PaymentTransactionDTO(
                 id=transaction_model.pk,
                 transaction_ref=transaction_model.transaction_ref,
-                amount=transaction_model.amount,
-                client_id=transaction_model.client,
-                order_id=transaction_model.order,
+                amount=float(transaction_model.amount),
+                client_id=transaction_model.client_id,
+                order_id=transaction_model.order_id,
                 status=transaction_model.status,
                 gateway_name=transaction_model.gateway_name,
                 gateway_ref=transaction_model.gateway_ref
