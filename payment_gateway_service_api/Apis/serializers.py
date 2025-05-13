@@ -83,4 +83,10 @@ class BankTransferSerializers(serializers.Serializer):
     # tx_ref = serializers.CharField(max_length=100)
     # fullname = serializers.CharField(max_length=100)
     is_permanent = serializers.BooleanField(default=False)
-    
+
+class BankTransferOutputSerializers(serializers.Serializer):
+    """
+    Serializer for output Bank payment response
+    """
+    transaction_ref = serializers.CharField(max_length=100)
+    gateway_response =serializers.JSONField()
