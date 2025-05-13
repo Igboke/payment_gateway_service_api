@@ -78,12 +78,12 @@ class FlutterWaveAdapter(PaymentGatewayInterface):
         response = requests.post(endpoint, json=payload, headers=self.headers)
         response.raise_for_status()
         data = response.json()
-
-        # Translate FlutterWave response into core GatewayProcessPaymentResponseDTO
         success = data.get("status") == "success"
         gateway_ref = None
-        if success and "meta" in data and "Authorization" in data["meta"]:
-             gateway_ref = data["meta"]["Authorization"].get("transfer_reference")
+        if success:
+            meta = data.get("meta", {})
+            authorization = meta.get("Authorization", {})
+            gateway_ref = authorization.get("transfer_reference")
 
         return GatewayProcessPaymentResponseDTO(
             success=success,
