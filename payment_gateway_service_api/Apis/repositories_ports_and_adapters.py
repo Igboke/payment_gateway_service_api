@@ -2,8 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Any
 from dataclasses import dataclass
 from django.contrib.auth import get_user_model
-from Orders.models import PaymentTransaction, Orders
-import uuid 
+from Orders.models import PaymentTransaction, Orders 
 
 @dataclass
 class ClientDTO:
