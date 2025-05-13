@@ -1,16 +1,23 @@
 import requests
+from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from payment_gateway_service_api.Apis.payments_ports_and_adapters import FlutterWaveAdapter
-from payment_gateway_service_api.Apis.repositories_ports_and_adapters import DjangoClientRepositoryAdapter
-from .serializers import BankTransferSerializers 
-from .core_logic import PaymentServiceCore, InitialPaymentRequestDTO, InitiatedPaymentResponseDTO 
+from .payments_ports_and_adapters import FlutterWaveAdapter
+from .repositories_ports_and_adapters import DjangoClientRepositoryAdapter
+from .serializers import BankTransferSerializers, BankTransferOutputSerializers 
+from .core_logic import PaymentServiceCore, InitialPaymentRequestDTO 
 
 class InitiatePaymentView(APIView):
     """
     API endpoint to initiate a payment.
     """
+    @extend_schema(
+        request=BankTransferSerializers,
+        responses={200: BankTransferOutputSerializers},
+        summary="",
+        description=""
+    )
     def post(self, request, *args, **kwargs):
         serializer = BankTransferSerializers(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -23,7 +30,7 @@ class InitiatePaymentView(APIView):
         # Instantiate the core service, injecting the adapters
         payment_service = PaymentServiceCore(
             gateway_adapter=payment_gateway_adapter,
-            client_repo=client_repo_adapter
+            client_repository=client_repo_adapter
         )
 
         try:
@@ -32,17 +39,20 @@ class InitiatePaymentView(APIView):
                 client_email=validated_data["email"],
                 amount=validated_data["amount"],
                 currency=validated_data["currency"],
-                is_permanent=validated_data.get("is_permanent", False)
+                is_permanent=validated_data.get("is_permanent", False),
+                payment_gateway_name="FlutterWave"
             )
 
             # Call the core service method
             response_dto = payment_service.initiate_payment(initial_request_dto)
 
             # Prepare the HTTP response based on the core's output DTO
-            return Response({
-                "transaction_ref": response_dto.transaction_ref,
-                "gateway_response": response_dto.gateway_response.raw_response,
-            }, status=status.HTTP_200_OK) # Or 201 Created
+            output_response_dict = {
+                "transaction_ref":response_dto.transaction_ref,
+                "gateway_response":response_dto.gateway_response.raw_response
+            }
+            output_serializer = BankTransferOutputSerializers(output_response_dict)
+            return Response(output_serializer.data, status=status.HTTP_200_OK)
 
         
         except ValueError as e:
