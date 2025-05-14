@@ -57,7 +57,7 @@ class ClientRepositoryInterface(ABC):
         pass
 
     @abstractmethod
-    def get_latest_order_and_amount_for_client(self, client_id: Any) -> list:
+    def get_latest_order_and_amount_for_client(self, client_id: Any) -> list[int|None]:
          """Get the ID/details and amount of the client's latest order."""
          pass
     
@@ -78,7 +78,7 @@ class DjangoClientRepositoryAdapter(ClientRepositoryInterface):
         except ClientModel.DoesNotExist:
             return None
 
-    def get_latest_order_and_amount_for_client(self, client_id: Any) -> list:
+    def get_latest_order_and_amount_for_client(self, client_id: Any) -> list[int|None]:
          try:
              order = Orders.objects.filter(client_id=client_id).latest('created_at')
              amount = float(order.total_amount) if order.total_amount is not None else 0.0
