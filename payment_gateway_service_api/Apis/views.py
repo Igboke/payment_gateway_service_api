@@ -13,8 +13,8 @@ class InitiatePaymentView(APIView):
     @extend_schema(
         request=BankTransferSerializers,
         responses={200: BankTransferOutputSerializers},
-        summary="",
-        description=""
+        summary="Perform Bank Transfers",
+        description="Perform Bank Transfers using FLutterWave"
     )
     def post(self, request, *args, **kwargs):
         serializer = BankTransferSerializers(data=request.data)
