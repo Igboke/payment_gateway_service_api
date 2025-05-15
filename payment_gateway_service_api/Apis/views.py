@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import BankTransferSerializers, BankTransferOutputSerializers  
-from .services import initiate_payment
+from .services import initiate_payment, handlewebhook
 
 class HandleWebhookView(APIView):
     """
@@ -13,8 +13,12 @@ class HandleWebhookView(APIView):
     def post(self,request,*args,**kwargs):
         #request at this point is not coming from the serializer field rather from flutterwave(payment gateway) its best to return 200 as documentation 
         data = request.data
-        
-        pass
+        # Call the service function to handle the webhook
+        try:
+            response_dto = handlewebhook(data)
+            return Response(response_dto, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class InitiatePaymentView(APIView):
     """
