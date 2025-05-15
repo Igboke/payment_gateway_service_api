@@ -1,6 +1,6 @@
 from typing import Dict, Any
 from .payments_ports_and_adapters import FlutterWaveAdapter
-from .repositories_ports_and_adapters import DjangoClientRepositoryAdapter
+from .repositories_ports_and_adapters import DjangoClientRepositoryAdapter, UpdateTransactionDTO
 from .core_logic import PaymentServiceCore, InitialPaymentRequestDTO
 
 def initiate_payment(validated_data) -> Dict[str, Any]:
@@ -54,6 +54,13 @@ def handlewebhook(request_data):
     try:
         # Call the core service method to handle the webhook
         # best to convert this to a DTO then the webhook call another function to update the transaction model to successful
+        """
+        for the update DTO i need
+        id_ transaction ref
+        status
+        gateway ref
+        amount
+        """
         response_dto = payment_service.handle_webhook(request_data)
 
         return response_dto
