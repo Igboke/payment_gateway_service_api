@@ -6,6 +6,16 @@ from rest_framework.views import APIView
 from .serializers import BankTransferSerializers, BankTransferOutputSerializers  
 from .services import initiate_payment
 
+class HandleWebhookView(APIView):
+    """
+    API endpoint to handle webhooks
+    """
+    def post(self,request,*args,**kwargs):
+        #request at this point is not coming from the serializer field rather from flutterwave(payment gateway) its best to return 200 as documentation 
+        data = request.data
+        
+        pass
+
 class InitiatePaymentView(APIView):
     """
     API endpoint to initiate a payment.
