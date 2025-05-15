@@ -36,3 +36,27 @@ def initiate_payment(validated_data) -> Dict[str, Any]:
 
     except ValueError as e:
         return {"error": str(e)}
+    
+def handlewebhook(request_data):
+    """
+    Handles the webhook from the payment gateway. 
+    """
+    # Instantiate the concrete adapters
+    payment_gateway_adapter = FlutterWaveAdapter()
+    client_repo_adapter = DjangoClientRepositoryAdapter()
+
+    # Instantiate the core service, injecting the adapters
+    payment_service = PaymentServiceCore(
+        gateway_adapter=payment_gateway_adapter,
+        client_repository=client_repo_adapter
+    )
+
+    try:
+        # Call the core service method to handle the webhook
+        # best to convert this to a DTO then the webhook call another function to update the transaction model to successful
+        response_dto = payment_service.handle_webhook(request_data)
+
+        return response_dto
+
+    except ValueError as e:
+        return {"error": str(e)}
