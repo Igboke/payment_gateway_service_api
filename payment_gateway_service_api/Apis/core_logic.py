@@ -74,4 +74,28 @@ class PaymentServiceCore:
             transaction_ref=updated_transaction.transaction_ref,
             gateway_response=gateway_response_dto,
         )
+    
+    def update_model_from_webhook(self, request_data):
+        """
+        Handles updating data using information gotten from the payment gateway webhook. 
+        """
+        # Call the core service method to handle the webhook
+        gateway_webhook_data=self.gateway_adapter.handle_webhook(request_data)
+        
+        if not gateway_webhook_data.internal_transaction_ref:
+            raise ValueError("Transaction reference not found in the webhook data")
+        transaction_model_id = self.client_repository.get_transaction_by_id(gateway_webhook_data.internal_transaction_ref)
+        if not transaction_model_id:
+            raise ValueError(f"Transaction with reference {gateway_webhook_data.internal_transaction_ref} not found")
+        
+        update_transaction_dto = UpdateTransactionDTO(
+            id=transaction_model_id,
+            status=gateway_webhook_data.new_status,
+            gateway_ref=gateway_webhook_data.gateway_ref,
+            amount=gateway_webhook_data.amount
+        )
+        
+        payment_transaction_dto = self.client_repository.update_payment_transaction(transaction_model_id, update_transaction_dto)
+        
+        return payment_transaction_dto
         
