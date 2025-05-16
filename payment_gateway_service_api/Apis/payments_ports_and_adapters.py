@@ -21,8 +21,8 @@ class GatewayProcessPaymentResponseDTO:
 
 @dataclass
 class GatewayWebhookEventDTO:
+    internal_transaction_ref: str
     gateway_ref: str
-    event_type: str
     new_status: str 
     amount: float
 
@@ -91,10 +91,20 @@ class FlutterWaveAdapter(PaymentGatewayInterface):
             raw_response=data
         )
     
-    def handle_webhook(self, request) -> dict:
+    def handle_webhook(self, request_data) -> GatewayWebhookEventDTO:
         # Handle webhook notifications from FlutterWave
-        # This is a placeholder implementation
-        return {"status": "Webhook received", "data": request.data}
+        # simply for extracting data and passing to a dto
+        data = request_data.get("data", {})
+        transaction_ref = data.get("tx_ref", "")
+        status = data.get("status", "")
+        gateway_ref = data.get("flw_ref", "")
+        amount = data.get("amount", 0.0)
+        return GatewayWebhookEventDTO(
+            internal_transaction_ref=transaction_ref,
+            gateway_ref=gateway_ref,
+            new_status=status,
+            amount=amount
+        )
     
     def verify_payment(self, transaction_ref: str) -> dict:
         # Verify payment using FlutterWave's verification API
