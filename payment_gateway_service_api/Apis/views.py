@@ -1,3 +1,4 @@
+import logging
 import requests
 from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
@@ -5,6 +6,10 @@ from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import BankTransferSerializers, BankTransferOutputSerializers  
 from .services import initiate_payment, update_model_from_webhook
+import traceback
+
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class HandleWebhookView(APIView):
     """
@@ -24,6 +29,7 @@ class HandleWebhookView(APIView):
     def post(self,request,*args,**kwargs):
         #request at this point is not coming from the serializer field rather from flutterwave(payment gateway) its best to return 200 as documentation 
         data = request.data
+        logging.info(f"Received webhook data: {data}")
         # Call the service function to handle the webhook
         try:
             response_dto = update_model_from_webhook(data)
@@ -61,13 +67,7 @@ class InitiatePaymentView(APIView):
             
             return Response({"error": "Payment gateway communication error:", "detail":str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
-            import traceback
             print("An exception occurred:")
             traceback.print_exc()
             return Response({"error": "An internal error occurred", "detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-
-
-# will add a webhook endpoint view similar to InitiatePaymentView
-# It would parse raw request body, create adapters/core, call payment_service.handle_gateway_webhook,
-# and return a 200 OK response if successful (as webhooks expect).
