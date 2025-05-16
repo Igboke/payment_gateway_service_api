@@ -30,7 +30,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = True
 
 #NGROK URL changes
-ALLOWED_HOSTS = ["localhost","9e83-105-113-118-125.ngrok-free.app"]
+ALLOWED_HOSTS = ["localhost","9e83-105-113-118-125.ngrok-free.app","8876-105-113-106-237.ngrok-free.app"]
 
 #FLUTTERWAVE API
 FLUTTERWAVE_PUBLIC_KEY = os.getenv("FLW_PUBLIC_KEY")
