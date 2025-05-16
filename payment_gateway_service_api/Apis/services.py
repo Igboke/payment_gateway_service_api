@@ -43,31 +43,29 @@ def update_model_from_webhook(request_data):
     Handles updating data using information gotten from the payment gateway webhook. 
     """
     # Instantiate the concrete adapters
+    payment_gateway_adapter = FlutterWaveAdapter()
     client_repo_adapter = DjangoClientRepositoryAdapter()
-
+    # Instantiate the core service, injecting the adapters
+    payment_service = PaymentServiceCore(
+        gateway_adapter=payment_gateway_adapter,
+        client_repository=client_repo_adapter
+    )
 
     try:
         # Call the core service method to handle the webhook
-        data = request_data.get("data", {})
-        transaction_ref = data.get("tx_ref", "")
-        if not transaction_ref:
-            raise ValueError("Transaction reference not found in the webhook data")
-        transaction_model = PaymentTransaction.objects.get(transaction_ref=transaction_ref)
-        payment_id = transaction_model.id
-        status = data.get("status", "")
-        gateway_ref = data.get("flw_ref", "")
-        amount = data.get("amount", 0.0)
-        update_transaction_dto = UpdateTransactionDTO(
-            id=payment_id,
-            status=status,
-            gateway_ref=gateway_ref,
-            amount=amount
-        )
-        payment_transaction_dto = client_repo_adapter.update_payment_transaction(payment_id, update_transaction_dto)
+        payment_transaction_dto=payment_service.update_model_from_webhook(request_data)
+        if payment_transaction_dto:
+            response = {
+                "message":"Successfully updated model",
+                "status":"Success"
+            }
+        else:
+            response={
+                "message":"Transaction model not found",
+                "status":"Failed"
+            }
 
-        return True if payment_transaction_dto else False
-    except PaymentTransaction.DoesNotExist:
-        return False
+        return response
 
     except ValueError as e:
         raise ValueError(str(e))
