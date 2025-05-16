@@ -4,21 +4,34 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import BankTransferSerializers, BankTransferOutputSerializers  
-from .services import initiate_payment, handlewebhook
+from .services import initiate_payment, update_model_from_webhook
 
 class HandleWebhookView(APIView):
     """
     API endpoint to handle webhooks
     """
+    @extend_schema(
+        request=None,
+        responses={200: {"description": "Webhook processed successfully."},
+            400: {"description": "Bad Request (e.g., invalid payload, missing signature)."},
+            401: {"description": "Unauthorized (e.g., invalid signature)."},
+            404: {"description": "Transaction not found."},
+            500: {"description": "Internal Server Error."}
+        },
+        summary="Handle Webhook",
+        description="Handles incoming webhook notifications from the payment gateway."
+    )
     def post(self,request,*args,**kwargs):
         #request at this point is not coming from the serializer field rather from flutterwave(payment gateway) its best to return 200 as documentation 
         data = request.data
         # Call the service function to handle the webhook
         try:
-            response_dto = handlewebhook(data)
+            response_dto = update_model_from_webhook(data)
+            if not response_dto:
+                return Response({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)
             return Response(response_dto, status=status.HTTP_200_OK)
         except ValueError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(ValueError(str(e)), status=status.HTTP_400_BAD_REQUEST)
 
 class InitiatePaymentView(APIView):
     """
