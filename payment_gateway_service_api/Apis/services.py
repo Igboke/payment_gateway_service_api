@@ -1,5 +1,6 @@
 from typing import Dict, Any
 from .payments_ports_and_adapters import FlutterWaveAdapter
+from Orders.models import PaymentTransaction
 from .repositories_ports_and_adapters import DjangoClientRepositoryAdapter, UpdateTransactionDTO
 from .core_logic import PaymentServiceCore, InitialPaymentRequestDTO
 
@@ -37,33 +38,36 @@ def initiate_payment(validated_data) -> Dict[str, Any]:
     except ValueError as e:
         return {"error": str(e)}
     
-def handlewebhook(request_data):
+def update_model_from_webhook(request_data):
     """
-    Handles the webhook from the payment gateway. 
+    Handles updating data using information gotten from the payment gateway webhook. 
     """
     # Instantiate the concrete adapters
-    payment_gateway_adapter = FlutterWaveAdapter()
     client_repo_adapter = DjangoClientRepositoryAdapter()
 
-    # Instantiate the core service, injecting the adapters
-    payment_service = PaymentServiceCore(
-        gateway_adapter=payment_gateway_adapter,
-        client_repository=client_repo_adapter
-    )
 
     try:
         # Call the core service method to handle the webhook
-        # best to convert this to a DTO then the webhook call another function to update the transaction model to successful
-        """
-        for the update DTO i need
-        id_ transaction ref
-        status
-        gateway ref
-        amount
-        """
-        response_dto = payment_service.handle_webhook(request_data)
+        data = request_data.get("data", {})
+        transaction_ref = data.get("tx_ref", "")
+        if not transaction_ref:
+            raise ValueError("Transaction reference not found in the webhook data")
+        transaction_model = PaymentTransaction.objects.get(transaction_ref=transaction_ref)
+        payment_id = transaction_model.id
+        status = data.get("status", "")
+        gateway_ref = data.get("flw_ref", "")
+        amount = data.get("amount", 0.0)
+        update_transaction_dto = UpdateTransactionDTO(
+            id=payment_id,
+            status=status,
+            gateway_ref=gateway_ref,
+            amount=amount
+        )
+        payment_transaction_dto = client_repo_adapter.update_payment_transaction(payment_id, update_transaction_dto)
 
-        return response_dto
+        return True if payment_transaction_dto else False
+    except PaymentTransaction.DoesNotExist:
+        return False
 
     except ValueError as e:
-        return {"error": str(e)}
+        raise ValueError(str(e))
