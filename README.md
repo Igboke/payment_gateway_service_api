@@ -108,7 +108,6 @@ FLUTTERWAVE_SECRET_KEY = os.getenv('FLUTTERWAVE_SECRET_KEY')
 # ...
 ```
 
-
 ### 5. Run the Development Server
 
 ```bash
