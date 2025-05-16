@@ -47,6 +47,11 @@ class ClientRepositoryInterface(ABC):
         pass
 
     @abstractmethod
+    def get_transaction_by_id(self, transaction_ref: Any) -> int:
+        """Retrieve a payment transaction by its Internal Transaction ID- UUID."""
+        pass
+
+    @abstractmethod
     def create_payment_transaction(self, transaction_data: CreateTransactionDTO) -> PaymentTransactionDTO:
         """Create a new payment transaction record."""
         pass
@@ -77,6 +82,12 @@ class DjangoClientRepositoryAdapter(ClientRepositoryInterface):
             )
         except ClientModel.DoesNotExist:
             return None
+        
+    def get_transaction_by_id(self, transaction_ref):
+        transaction_model = PaymentTransaction.objects.get(transaction_ref=transaction_ref)
+        if not transaction_model:
+            raise ValueError("Transaction reference not found in the webhook data")
+        return transaction_model.pk
 
     def get_latest_order_and_amount_for_client(self, client_id: Any) -> list[int|None]:
          try:
