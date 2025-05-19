@@ -12,6 +12,10 @@ class PaymentDetails:
     client_email: str
     client_name: str
     is_permanent: bool = False
+    bank_code: str = "50211", 
+    bank_phone: str = "+2348100000000",
+    bank_token: str = "123456"
+
 
 @dataclass
 class GatewayProcessPaymentResponseDTO:
@@ -48,6 +52,25 @@ class PaymentGatewayInterface(ABC):
     def verify_payment(self, transaction_ref: str) -> Dict[str, Any]: # Or return a GatewayVerificationResponseDTO?
         """Verifies a payment via this gateway. Returns gateway-specific response."""
         pass
+
+class PayStackAdapter(PaymentGatewayInterface):
+    """
+    Implements the PaymentGatewayinterface for the FLuterWave payment gateway
+
+    Unique behaviour:
+    - Processes payment by sending requests to paystack's payment endpoint
+    - Handles webhook notifications specific to flutterwave's format.
+    - Verifies transaction using Paystack's verification API
+    """
+    def process_payment(self, payment_details:PaymentDetails) -> GatewayProcessPaymentResponseDTO:
+        pass
+
+    def handle_webhook(self, request_data) -> GatewayWebhookEventDTO:
+        pass
+
+    def verify_payment(self, transaction_ref:str):
+        pass
+    
 
 class FlutterWaveAdapter(PaymentGatewayInterface):
     """
