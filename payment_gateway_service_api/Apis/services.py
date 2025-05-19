@@ -9,7 +9,13 @@ def initiate_payment(validated_data) -> Dict[str, Any]:
     Initiates a payment process for a client. FOllowing SRP
     """
     # Instantiate the concrete adapters
-    payment_gateway_adapter = random.choice([FlutterWaveAdapter(), PayStackAdapter()])
+    if random.random() < 0.5:
+        payment_gateway_adapter = PayStackAdapter()
+        payment_gateway_name = "PayStack"
+    else:
+        payment_gateway_adapter = FlutterWaveAdapter()
+        payment_gateway_name = "FlutterWave"
+    
     client_repo_adapter = DjangoClientRepositoryAdapter()
 
     # Instantiate the core service, injecting the adapters
@@ -23,7 +29,7 @@ def initiate_payment(validated_data) -> Dict[str, Any]:
                 client_email=validated_data["email"],
                 currency=validated_data["currency"],
                 is_permanent=validated_data.get("is_permanent", False),
-                payment_gateway_name="FlutterWave"
+                payment_gateway_name=payment_gateway_name
             )
         
         # Call the core service method
