@@ -9,8 +9,8 @@ Currently, this module provides an adapter for **FlutterWave** (specifically for
 * **Hexagonal Architecture (Ports & Adapters):**
   * **Decoupled Core Logic:** The `core_logic.py` contains business rules and orchestrates payment flows, unaware of Django or specific payment gateways.
   * **Clear Interfaces (Ports):** `PaymentGatewayInterface` and `ClientRepositoryInterface` define contracts for external interactions.
-  * **Concrete Implementations (Adapters):** `FlutterWaveAdapter` and `DjangoClientRepositoryAdapter` provide specific implementations for these interfaces.
-* **Payment Initiation:** Supports initiating payments via integrated gateways (e.g., FlutterWave bank transfer).
+  * **Concrete Implementations (Adapters):** `PayStackAdapter` `FlutterWaveAdapter` and `DjangoClientRepositoryAdapter` provide specific implementations for these interfaces.
+* **Payment Initiation:** Supports initiating payments via integrated gateways (e.g. PayStack Charge, FlutterWave bank transfer).
 * **Webhook Handling:** Designed to process incoming webhook notifications from payment gateways to update transaction statuses.
 * **Data Transfer Objects (DTOs):** Ensures clear and consistent data structures between layers.
 * **Django REST Framework Integration:** Provides API endpoints for initiating payments and handling webhooks.
@@ -35,6 +35,7 @@ This module follows the **Ports and Adapters (Hexagonal) Architecture**:
         * Django views (`views.py`) and serializers (`serializers.py`) adapt incoming HTTP requests to calls on the `services.py` layer, which then interacts with the `PaymentServiceCore`.
     * **Secondary/Driven Adapters (Output):**
         * `FlutterWaveAdapter`: Implements `PaymentGatewayInterface` to interact with the FlutterWave API.
+        * `PayStackAdapter`: Implements `PaymentGatewayInterface` to interact with the PayStack API.
         * `DjangoClientRepositoryAdapter`: Implements `ClientRepositoryInterface` to interact with the Django ORM for data persistence.
 
 4. **Services (`services.py`):**
@@ -105,6 +106,7 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 # Custom settings for your payment module
 FLUTTERWAVE_SECRET_KEY = os.getenv('FLUTTERWAVE_SECRET_KEY')
+PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY")
 # ...
 ```
 
@@ -256,7 +258,7 @@ One of the key benefits of this architecture is the ease of adding new payment g
 
 1. **Define DTOs (if needed):** If the new gateway has significantly different request/response structures that cannot be mapped to existing DTOs (`PaymentDetails`, `GatewayProcessPaymentResponseDTO`, `GatewayWebhookEventDTO`), define new ones or adapt existing ones.
 2. **Create New Adapter:**
-    * Create a new class (e.g., `PaystachAdapter`) in `payments_ports_and_adapters.py`.
+    * Create a new class (e.g., `PayStackAdapter`) in `payments_ports_and_adapters.py`.
     * This class must implement the `PaymentGatewayInterface`.
     * Implement the `process_payment`, `handle_webhook`, and `verify_payment` methods, translating data to/from the new gateway's API and your core DTOs.
 3. **Update Service Layer (`services.py`):**
