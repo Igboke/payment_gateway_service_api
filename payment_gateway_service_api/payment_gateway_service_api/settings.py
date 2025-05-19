@@ -39,6 +39,11 @@ FLUTTERWAVE_ENCRYPTION_KEY = os.getenv("FLW_ENCRYPTION_KEY")
 #FLUTTERWAVE ENDPOINTS
 FLUTTERWAVE_BANK_TRANSFER_ENDPOINT = "https://api.flutterwave.com/v3/charges?type=bank_transfer"
 
+#PAYSTACK API
+PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY")
+PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY")
+
+
 
 # Application definition
 
