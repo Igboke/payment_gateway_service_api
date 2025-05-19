@@ -1,7 +1,7 @@
 from typing import Dict, Any
+import random
 from .payments_ports_and_adapters import FlutterWaveAdapter, PayStackAdapter
-from Orders.models import PaymentTransaction
-from .repositories_ports_and_adapters import DjangoClientRepositoryAdapter, UpdateTransactionDTO
+from .repositories_ports_and_adapters import DjangoClientRepositoryAdapter
 from .core_logic import PaymentServiceCore, InitialPaymentRequestDTO
 
 def initiate_payment(validated_data) -> Dict[str, Any]:
@@ -9,8 +9,7 @@ def initiate_payment(validated_data) -> Dict[str, Any]:
     Initiates a payment process for a client. FOllowing SRP
     """
     # Instantiate the concrete adapters
-    #payment_gateway_adapter = FlutterWaveAdapter()
-    payment_gateway_adapter = PayStackAdapter()
+    payment_gateway_adapter = random.choice([FlutterWaveAdapter(), PayStackAdapter()])
     client_repo_adapter = DjangoClientRepositoryAdapter()
 
     # Instantiate the core service, injecting the adapters
