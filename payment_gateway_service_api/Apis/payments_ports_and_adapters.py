@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Optional
 from django.conf import settings
 import requests
+import paystack
 
 @dataclass
 class PaymentDetails:
@@ -12,8 +13,8 @@ class PaymentDetails:
     client_email: str
     client_name: str
     is_permanent: bool = False
-    bank_code: str = "50211", 
-    bank_phone: str = "+2348100000000",
+    bank_code: str = "50211"
+    bank_phone: str = "+2348100000000"
     bank_token: str = "123456"
 
 
@@ -63,7 +64,37 @@ class PayStackAdapter(PaymentGatewayInterface):
     - Verifies transaction using Paystack's verification API
     """
     def process_payment(self, payment_details:PaymentDetails) -> GatewayProcessPaymentResponseDTO:
-        pass
+        # Initialize Paystack client
+        paystack.api_key = settings.PAYSTACK_SECRET_KEY
+        amount = payment_details.amount * 100  # Paystack expects amount in kobo
+        bank = {
+            "code": payment_details.bank_code,#"50211",
+            "phone": payment_details.bank_phone,#"+2348100000000",
+            "token": payment_details.bank_token,#"123456"
+        }
+ 
+
+        # Create a payment charge request
+        response = paystack.Charge.create(
+            email=payment_details.client_email,
+            amount=amount,
+            bank=bank,
+            reference=payment_details.tx_ref,
+            
+        )
+        if response:
+            status = response.status
+            data = response.data
+            success = status == True
+            response_data = {"data":response.data,
+                    "message":response.message,
+                    "status":response.status
+            }
+        return GatewayProcessPaymentResponseDTO(
+            success=success,
+            gateway_ref=data.get("reference"),
+            raw_response=response_data
+        )
 
     def handle_webhook(self, request_data) -> GatewayWebhookEventDTO:
         pass
