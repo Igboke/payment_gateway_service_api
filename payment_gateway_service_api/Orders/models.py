@@ -47,8 +47,8 @@ class OrderItem(models.Model):
         return f"{self.pk}"
     
 class PaymentTransaction(models.Model):
-    order = models.ForeignKey(Orders,on_delete=models.CASCADE,related_name="payment_transaction")#switch to protected
-    client = models.ForeignKey(ClientModel,on_delete=models.CASCADE,related_name="client_payment")#switch to protected
+    order = models.ForeignKey(Orders,on_delete=models.PROTECT,related_name="payment_transaction")
+    client = models.ForeignKey(ClientModel,on_delete=models.PROTECT,related_name="client_payment")
     amount = models.DecimalField(max_digits=10, decimal_places=2, help_text="Payment Amount")
     status = models.CharField(max_length=15,default="pending",choices=STATUS_CHOICES,help_text="Payment Status")
     transaction_ref = models.CharField(max_length=255, unique=True, help_text="Internal transaction reference.")
