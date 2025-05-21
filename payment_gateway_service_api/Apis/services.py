@@ -48,9 +48,11 @@ def update_model_from_webhook(request_data):
     """
     Handles updating data using information gotten from the payment gateway webhook. 
     """
-    # Instantiate the concrete adapters
-    #fix the logic here this function would need to dynamically select the correct adapter, perhaps based on the webhook source (e.g., path, headers, or payload content if distinguishable)
-    payment_gateway_adapter = FlutterWaveAdapter()
+    transaction_ref = request_data.get("data", {}).get("tx_ref", "")
+    if transaction_ref:
+        payment_gateway_adapter = FlutterWaveAdapter()
+    else:
+        payment_gateway_adapter = PayStackAdapter()
     client_repo_adapter = DjangoClientRepositoryAdapter()
     # Instantiate the core service, injecting the adapters
     payment_service = PaymentServiceCore(
