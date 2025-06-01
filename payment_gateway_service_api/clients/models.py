@@ -2,7 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.contrib.auth import get_user_model
 from clients.utils import Address
-from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ClientManager(BaseUserManager):
@@ -15,7 +17,7 @@ class ClientManager(BaseUserManager):
         Create and return user with email and password
         """
         if not email:
-            settings.logger.error("Email is required, email must be set")
+            logger.error("Email is required, email must be set")
             raise ValueError("Email is required, email must be set")
 
         # normalize mail-(lowercasing-emails are case insensitive), trimming white space and handling some specific domains like gmail
@@ -39,16 +41,16 @@ class ClientManager(BaseUserManager):
         extra_fields.setdefault("is_active", True)
 
         if extra_fields.get("is_staff") is not True:
-            settings.logger.error("Super User must have is_staff set to True")
+            logger.error("Super User must have is_staff set to True")
             raise ValueError("Super User must have is_staff set to True")
         if extra_fields.get("is_superuser") is not True:
-            settings.logger.error("Super User must have is_superuser set to True")
+            logger.error("Super User must have is_superuser set to True")
             raise ValueError("Super User must have is_superuser set to True")
         if extra_fields.get("is_active") is not True:
-            settings.logger.error("Super user must have is_active set to True")
+            logger.error("Super user must have is_active set to True")
             raise ValueError("Super user must have is_active set to True")
         if not email:
-            settings.logger.error("Email must be set, No email available")
+            logger.error("Email must be set, No email available")
             raise ValueError("Email must be set, No email available")
 
         return self.create_user(email, password, **extra_fields)
