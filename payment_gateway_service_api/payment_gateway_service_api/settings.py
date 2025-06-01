@@ -50,6 +50,10 @@ FLUTTERWAVE_ENCRYPTION_KEY = os.getenv("FLW_ENCRYPTION_KEY")
 FLUTTERWAVE_BANK_TRANSFER_ENDPOINT = (
     "https://api.flutterwave.com/v3/charges?type=bank_transfer"
 )
+# FLUTTERWAVE VERIFICATION URL
+FLUTTERWAVE_VERIFICATION_URL = (
+    "https://api.flutterwave.com/v3/charges?tx_ref={transaction_ref}"
+)
 
 # PAYSTACK API
 PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY")
