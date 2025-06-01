@@ -135,6 +135,7 @@ class PayStackAdapter(PaymentGatewayInterface):
                 "message": response.message,
                 "status": response.status,
             }
+            logger.info(f"Processing payment: success={success}, data={response_data}")
         return GatewayProcessPaymentResponseDTO(
             success=success,
             gateway_ref=data.get("reference"),
@@ -155,6 +156,9 @@ class PayStackAdapter(PaymentGatewayInterface):
         status = data.get("status", "")
         gateway_ref = data.get("customer", "").get("customer_code", "")
         amount = data.get("amount", 0.0) // 100  # Convert to Naira
+        logger.info(
+            f"Handling webhook: tx_ref={transaction_ref}, status={status}, gateway_ref={gateway_ref}, amount={amount}"
+        )
         return GatewayWebhookEventDTO(
             internal_transaction_ref=transaction_ref,
             gateway_ref=gateway_ref,
@@ -210,6 +214,9 @@ class FlutterWaveAdapter(PaymentGatewayInterface):
             meta = data.get("meta", {})
             authorization = meta.get("Authorization", {})
             gateway_ref = authorization.get("transfer_reference")
+            logger.info(
+                f"Processing payment: success={success}, gateway_ref={gateway_ref}, data={data}"
+            )
 
         return GatewayProcessPaymentResponseDTO(
             success=success, gateway_ref=gateway_ref, raw_response=data
