@@ -8,7 +8,7 @@ class ProductsModelTest(TestCase):
     """
 
     def setUp(self):
-        """ "
+        """
         Set up a product instance for testing.
         """
         self.product_1 = Products.objects.create(
@@ -56,7 +56,7 @@ class ProductsModelTest(TestCase):
         Test the constraints on the product model.
         """
         with self.assertRaises(Exception) as context:
-            # Attempt to create a product with negative quantity
+
             Products.objects.create(
                 name="Invalid Test Product 3",
                 quantity=-10,
