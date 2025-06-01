@@ -13,15 +13,16 @@ logger = logging.getLogger(__name__)
 class PaymentDetails:
     """Data Transfer Object for payment details.
     This DTO encapsulates all necessary information to process a payment.
-    - tx_ref: Unique reference for the transaction.
-    - amount: Amount to be charged.
-    - currency: Currency in which the payment is made.
-    - client_email: Email of the client making the payment.
-    - client_name: Name of the client making the payment.
-    - is_permanent: Whether the payment is for a permanent service or not.
-    - bank_code: Bank code for the payment.
-    - bank_phone: Phone number associated with the bank account.
-    - bank_token: Token for the bank account.
+    Attributes:
+        tx_ref: Unique reference for the transaction.
+        amount: Amount to be charged.
+        currency: Currency in which the payment is made.
+        client_email: Email of the client making the payment.
+        client_name: Name of the client making the payment.
+        is_permanent: Whether the payment is for a permanent service or not.
+        bank_code: Bank code for the payment.
+        bank_phone: Phone number associated with the bank account.
+        bank_token: Token for the bank account.
     """
 
     tx_ref: str
