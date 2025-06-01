@@ -6,10 +6,12 @@ from clients.utils import Address
 
 ClientModel = get_user_model()
 
+
 class AddressSerializers(serializers.ModelSerializer):
     """
     Address Serializer
     """
+
     class Meta:
         model = Address
         fields = [
@@ -22,11 +24,14 @@ class AddressSerializers(serializers.ModelSerializer):
             "country",
         ]
 
+
 class ClientModelSerializers(serializers.ModelSerializer):
     """
     Client Serializer
     """
+
     house_address = AddressSerializers(many=True, required=False)
+
     class Meta:
         model = ClientModel
         fields = [
@@ -37,10 +42,12 @@ class ClientModelSerializers(serializers.ModelSerializer):
             "house_address",
         ]
 
+
 class ProductsSerializers(serializers.ModelSerializer):
     """
     Product Serializer
     """
+
     class Meta:
         model = Products
         fields = [
@@ -52,14 +59,18 @@ class ProductsSerializers(serializers.ModelSerializer):
             "is_available",
         ]
 
+
 class OrdersSerializers(serializers.ModelSerializer):
     """
     Order Serializer
     """
+
     client = ClientModelSerializers(read_only=True)
     shipping_address = AddressSerializers(many=True)
     billing_address = AddressSerializers(many=True)
-    order_line = serializers.PrimaryKeyRelatedField(many=True, queryset=OrderItem.objects.all())
+    order_line = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=OrderItem.objects.all()
+    )
 
     class Meta:
         model = Orders
@@ -73,17 +84,21 @@ class OrdersSerializers(serializers.ModelSerializer):
             "order_line",
         ]
 
+
 class BankTransferSerializers(serializers.Serializer):
     """
     Serializer for incoming Bank payment request
     """
+
     email = serializers.EmailField()
-    currency = serializers.CharField(max_length=3,default="NGN")
+    currency = serializers.CharField(max_length=3, default="NGN")
     is_permanent = serializers.BooleanField(default=False)
+
 
 class BankTransferOutputSerializers(serializers.Serializer):
     """
     Serializer for output Bank payment response
     """
+
     transaction_ref = serializers.CharField(max_length=100)
-    gateway_response =serializers.JSONField()
+    gateway_response = serializers.JSONField()
