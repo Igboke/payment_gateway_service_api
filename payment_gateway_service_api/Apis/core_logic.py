@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 import uuid
-from django.conf import settings
 from .payments_ports_and_adapters import (
     GatewayProcessPaymentResponseDTO,
     PaymentDetails,
@@ -11,6 +10,9 @@ from .repositories_ports_and_adapters import (
     CreateTransactionDTO,
     UpdateTransactionDTO,
 )
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -73,16 +75,14 @@ class PaymentServiceCore:
         client = self.client_repository.get_client_by_email(request_data.client_email)
 
         if not client:
-            settings.logger.error(
-                f"Client with email {request_data.client_email} not found"
-            )
+            logger.error(f"Client with email {request_data.client_email} not found")
             raise ValueError(f"Client with email {request_data.client_email} not found")
 
         latest_order_id, amount = (
             self.client_repository.get_latest_order_and_amount_for_client(client.id)
         )
         if not latest_order_id:
-            settings.logger.error(f"No order found for client {client.id}")
+            logger.error(f"No order found for client {client.id}")
             raise ValueError(f"No order found for client {client.id}")
 
         transaction_ref = str(uuid.uuid4())
@@ -136,13 +136,13 @@ class PaymentServiceCore:
         gateway_webhook_data = self.gateway_adapter.handle_webhook(request_data)
 
         if not gateway_webhook_data.internal_transaction_ref:
-            settings.logger.error("Transaction reference not found in the webhook data")
+            logger.error("Transaction reference not found in the webhook data")
             raise ValueError("Transaction reference not found in the webhook data")
         transaction_model_id = self.client_repository.get_transaction_by_id(
             gateway_webhook_data.internal_transaction_ref
         )
         if not transaction_model_id:
-            settings.logger.error(
+            logger.error(
                 f"Transaction with reference {gateway_webhook_data.internal_transaction_ref} not found"
             )
             raise ValueError(
