@@ -1,12 +1,14 @@
 from django.test import TestCase
 from .models import Products
 
+
 class ProductsModelTest(TestCase):
     """
     Test case for the Products model.
     """
+
     def setUp(self):
-        """"
+        """ "
         Set up a product instance for testing.
         """
         self.product_1 = Products.objects.create(
@@ -16,12 +18,13 @@ class ProductsModelTest(TestCase):
             price=99.99,
         )
         self.product_2 = Products.objects.create(
-            name= "Test Product 2",
+            name="Test Product 2",
             quantity=0,
             description="Test Description 2",
             price=49.99,
-            is_available = False,
+            is_available=False,
         )
+
     def test_product_creation(self):
         """
         Test the creation of a product.
@@ -47,7 +50,7 @@ class ProductsModelTest(TestCase):
         products = Products.objects.all()
         self.assertEqual(products[0], self.product_1)
         self.assertEqual(products[1], self.product_2)
-    
+
     def test_product_constraints(self):
         """
         Test the constraints on the product model.
@@ -60,8 +63,11 @@ class ProductsModelTest(TestCase):
                 description="Invalid Test Description 3",
                 price=19.99,
             )
-        
-        self.assertEqual(str(context.exception), "CHECK constraint failed: quantity_greater_than_zero")
+
+        self.assertEqual(
+            str(context.exception),
+            "CHECK constraint failed: quantity_greater_than_zero",
+        )
 
     def test_product_availability(self):
         """
@@ -71,4 +77,3 @@ class ProductsModelTest(TestCase):
         """
         self.assertTrue(self.product_1.is_available)
         self.assertFalse(self.product_2.is_available)
-
