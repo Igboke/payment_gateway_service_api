@@ -3,10 +3,12 @@ from django.test import TestCase
 from .models import Products, Orders, OrderItem, Address
 from django.contrib.auth import get_user_model
 
+
 class OrdersTestCase(TestCase):
     """
     Test case for the Orders model
     """
+
     def setUp(self):
         self.address = Address.objects.create(
             street_line1="Bourdillion Street",
@@ -14,14 +16,14 @@ class OrdersTestCase(TestCase):
             city="Ikoyi",
             state_province="Lagos",
             postal_code="101233",
-            country="USA"
+            country="USA",
         )
         self.client_1 = get_user_model().objects.create_user(
             email="danieligboke669@gmail.com",
             password="password123",
             first_name="Daniel",
             last_name="Igboke",
-            house_address = self.address
+            house_address=self.address,
         )
 
         self.product = Products.objects.create(
@@ -29,16 +31,16 @@ class OrdersTestCase(TestCase):
             quantity=10,
             description="Test Description",
             price=100.00,
-            is_available=True
+            is_available=True,
         )
         self.order_1 = Orders.objects.create(
-            client= self.client_1,
+            client=self.client_1,
             status="pending",
             total_amount=0.00,
             shipping_address=self.address,
-            billing_address=self.address
+            billing_address=self.address,
         )
-    
+
     def test_product_creation(self):
         """
         Test the creation of a product
@@ -64,9 +66,7 @@ class OrdersTestCase(TestCase):
         Test the creation of an order item
         """
         self.order_item = OrderItem.objects.create(
-            product=self.product,
-            order=self.order_1,
-            quantity=2
+            product=self.product, order=self.order_1, quantity=2
         )
         self.assertEqual(self.order_item.product, self.product)
         self.assertEqual(self.order_item.order, self.order_1)
@@ -78,9 +78,7 @@ class OrdersTestCase(TestCase):
         Test the string representation of an order item
         """
         self.order_item = OrderItem.objects.create(
-            product=self.product,
-            order=self.order_1,
-            quantity=2
+            product=self.product, order=self.order_1, quantity=2
         )
         self.assertEqual(str(self.order_item), str(self.order_item.pk))
 
@@ -93,15 +91,21 @@ class OrdersTestCase(TestCase):
         with self.assertRaises(ValidationError) as context:
             order_item.full_clean()
 
-        self.assertIn('quantity', context.exception.message_dict)
-        self.assertIn('Ensure this value is greater than or equal to 1.', context.exception.message_dict['quantity'][0])
+        self.assertIn("quantity", context.exception.message_dict)
+        self.assertIn(
+            "Ensure this value is greater than or equal to 1.",
+            context.exception.message_dict["quantity"][0],
+        )
 
         # Attempt to create an OrderItem with negative quantity
-        order_item_negative = OrderItem(product=self.product, order=self.order_1, quantity=-5)
+        order_item_negative = OrderItem(
+            product=self.product, order=self.order_1, quantity=-5
+        )
         with self.assertRaises(ValidationError) as context:
             order_item_negative.full_clean()
 
-        self.assertIn('quantity', context.exception.message_dict)
-        self.assertIn('Ensure this value is greater than or equal to 1.', context.exception.message_dict['quantity'][0])
-    
-
+        self.assertIn("quantity", context.exception.message_dict)
+        self.assertIn(
+            "Ensure this value is greater than or equal to 1.",
+            context.exception.message_dict["quantity"][0],
+        )
