@@ -39,12 +39,16 @@ class ClientManager(BaseUserManager):
         extra_fields.setdefault("is_active", True)
 
         if extra_fields.get("is_staff") is not True:
+            settings.logger.error("Super User must have is_staff set to True")
             raise ValueError("Super User must have is_staff set to True")
         if extra_fields.get("is_superuser") is not True:
+            settings.logger.error("Super User must have is_superuser set to True")
             raise ValueError("Super User must have is_superuser set to True")
         if extra_fields.get("is_active") is not True:
+            settings.logger.error("Super user must have is_active set to True")
             raise ValueError("Super user must have is_active set to True")
         if not email:
+            settings.logger.error("Email must be set, No email available")
             raise ValueError("Email must be set, No email available")
 
         return self.create_user(email, password, **extra_fields)
