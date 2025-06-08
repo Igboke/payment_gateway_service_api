@@ -10,7 +10,12 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from clients.utils import Address
-
+from Orders.models import Orders
+from .repositories_ports_and_adapters import (
+    ClientRepositoryInterface,
+    ClientDTO,
+    PaymentTransactionDTO,
+)
 from .core_logic import (
     PaymentServiceCore,
     InitialPaymentRequestDTO,
@@ -20,20 +25,15 @@ from .payments_ports_and_adapters import (
     PaymentGatewayInterface,
     GatewayProcessPaymentResponseDTO,
 )
-from .repositories_ports_and_adapters import (
-    ClientRepositoryInterface,
-    ClientDTO,
-    CreateTransactionDTO,
-    PaymentTransactionDTO,
-)
-from Orders.models import Orders, PaymentTransaction
 
 
 ClientModel = get_user_model()
 
 
-# 1. TEST THE CORE LOGIC IN ISOLATION: We use Mock objects that conform to our Port interfaces.
 class PaymentServiceCoreTests(TestCase):
+    """
+    TEST THE CORE LOGIC IN ISOLATION: We use Mock objects that conform to our Port interfaces.
+    """
 
     def setUp(self):
         # Create MOCK implementations of our ports (interfaces)
