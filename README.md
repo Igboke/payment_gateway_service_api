@@ -223,10 +223,10 @@ The following endpoints are provided by `views.py` and configured in `urls.py`:
 
 ## 🧪 Running Tests
 
-To run tests for this app (e.g., `payments_app`):
+To run tests for this app (e.g., `Apis`):
 
 ```bash
-python manage.py test 
+python manage.py test Apis.tests
 ```
 
 Or to run all tests in the project:
@@ -242,6 +242,7 @@ python manage.py test
   * `PaymentGatewayInterface` (Port)
   * `PaymentDetails`, `GatewayProcessPaymentResponseDTO`, `GatewayWebhookEventDTO` (Data contracts for the port)
   * `FlutterWaveAdapter` (Adapter for FlutterWave)
+  * `PayStackAdapter` (Adapter for PayStack)
 * `repositories_ports_and_adapters.py`:
   * `ClientRepositoryInterface` (Port)
   * `ClientDTO`, `PaymentTransactionDTO`, `CreateTransactionDTO`, `UpdateTransactionDTO` (Data contracts for the port)
@@ -258,7 +259,7 @@ One of the key benefits of this architecture is the ease of adding new payment g
 
 1. **Define DTOs (if needed):** If the new gateway has significantly different request/response structures that cannot be mapped to existing DTOs (`PaymentDetails`, `GatewayProcessPaymentResponseDTO`, `GatewayWebhookEventDTO`), define new ones or adapt existing ones.
 2. **Create New Adapter:**
-    * Create a new class (e.g., `PayStackAdapter`) in `payments_ports_and_adapters.py`.
+    * Create a new class (e.g., `StripeAdapter`) in `payments_ports_and_adapters.py`.
     * This class must implement the `PaymentGatewayInterface`.
     * Implement the `process_payment`, `handle_webhook`, and `verify_payment` methods, translating data to/from the new gateway's API and your core DTOs.
 3. **Update Service Layer (`services.py`):**
@@ -308,3 +309,5 @@ Contributions are welcome! If you'd like to contribute, please:
 Please ensure your code adheres to any existing coding standards and includes relevant documentation.
 
 ## 📜 License
+
+[MIT](LICENSE)
