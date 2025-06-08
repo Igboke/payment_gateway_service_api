@@ -93,4 +93,4 @@ def update_model_from_webhook(request_data):
 
     except ValueError as e:
         logger.error(f"Error updating model from webhook: {str(e)}")
-        raise ValueError(str(e))
+        raise ValueError(str(e)) from e
