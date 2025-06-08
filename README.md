@@ -272,15 +272,16 @@ One of the key benefits of this architecture is the ease of adding new payment g
         # ...
         from .payments_ports_and_adapters import FlutterWaveAdapter, PayStackAdapter, StripeAdapter # Import new adapter
 
-        def initiate_payment(validated_data, gateway_name: str) -> Dict[str, Any]:
+        def initiate_payment(validated_data) -> Dict[str, Any]:
             client_repo_adapter = DjangoClientRepositoryAdapter()
 
-            if gateway_name == "FlutterWave":
-                payment_gateway_adapter = FlutterWaveAdapter()
-            elif gateway_name == "Paystack":
+            #Modify this to extend to a new adapter
+            if random.random() < 0.5:
                 payment_gateway_adapter = PayStackAdapter()
+                payment_gateway_name = "PayStack"
             else:
-                raise ValueError(f"Unsupported gateway: {gateway_name}")
+                payment_gateway_adapter = FlutterWaveAdapter()
+                payment_gateway_name = "FlutterWave"
 
             payment_service = PaymentServiceCore(
                 gateway_adapter=payment_gateway_adapter,
