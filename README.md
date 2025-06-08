@@ -270,7 +270,7 @@ One of the key benefits of this architecture is the ease of adding new payment g
         ```python
         # services.py
         # ...
-        from .payments_ports_and_adapters import FlutterWaveAdapter, PayStackAdapter # Import new adapter
+        from .payments_ports_and_adapters import FlutterWaveAdapter, PayStackAdapter, StripeAdapter # Import new adapter
 
         def initiate_payment(validated_data, gateway_name: str) -> Dict[str, Any]:
             client_repo_adapter = DjangoClientRepositoryAdapter()
